@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body_class %}toc{% endblock %}
+{% block content %}
+<section class="toc-page">
+  <h1 class="toc-title">{{ toc.title }}</h1>
+  <nav class="toc">
+    <ol class="toc-list toc-list-1">
+    {% for entry in entries recursive %}
+      <li class="toc-item level-{{ entry.level }}">
+        {% if toc.links %}<a class="toc-entry" href="{{ entry.href }}"
+        {%- else %}<span class="toc-entry"{% endif %}
+        {%- if toc.include_page_numbers %} data-page="{{ entry.label }}"{% endif %}>
+          {%- if entry.number %}<span class="toc-number">{{ entry.number }}</span>{% endif -%}
+          <span class="toc-text">{{ entry.title }}</span>
+        {%- if toc.links %}</a>{% else %}</span>{% endif %}
+        {% if entry.children %}
+        <ol class="toc-list toc-list-{{ entry.level + 1 }}">{{ loop(entry.children) }}</ol>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ol>
+  </nav>
+</section>
+{% endblock %}

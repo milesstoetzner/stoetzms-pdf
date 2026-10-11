@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# vitepress
+node_modules/
+docs/.vitepress/dist
+docs/.vitepress/cache

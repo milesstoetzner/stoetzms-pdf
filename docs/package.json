@@ -1,0 +1,16 @@
+{
+    "name": "stoetzms-pdf",
+    "private": true,
+    "repository": "https://github.com/milesstoetzner/stoetzms-pdf",
+    "homepage": "https://pdf.stoetz.ms",
+    "author": "Miles Stötzner <miles@stoetzner.de>",
+    "license": "Apache-2.0",
+    "scripts": {
+        "dev": "vitepress dev",
+        "build": "vitepress build",
+        "preview": "vitepress preview"
+    },
+    "devDependencies": {
+        "vitepress": "^1.6.3"
+    }
+}

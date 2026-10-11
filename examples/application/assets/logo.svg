@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="64" viewBox="0 0 280 64">
+  <rect x="0" y="8" width="48" height="48" rx="6" fill="#000000"/>
+  <path d="M14 44 L24 18 L34 44 M18 35 H30" stroke="#ffffff" stroke-width="4" fill="none" stroke-linejoin="round"/>
+  <text x="62" y="41" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#000000">Example Applicant</text>
+</svg>

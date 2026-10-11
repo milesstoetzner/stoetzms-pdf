@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body_class %}divider align-{{ style.divider_align }}{% endblock %}
+{% block content %}
+<section class="divider-page">
+  {% if divider.logo %}
+  <img class="logo divider-logo" src="{{ divider.logo }}" alt="">
+  {% endif %}
+  <div class="divider-main">
+    {% if divider.number %}
+    <p class="divider-number">{{ divider.label }} {{ divider.number }}</p>
+    {% endif %}
+    <div class="accent-bar"></div>
+    <h1 class="divider-title">{{ divider.title }}</h1>
+    {% if divider.subtitle %}
+    <p class="divider-subtitle">{{ divider.subtitle }}</p>
+    {% endif %}
+    {% if divider.description %}
+    <div class="divider-description">{{ divider.description }}</div>
+    {% endif %}
+    {% if divider.list_documents %}
+    <ol class="divider-documents">
+      {% for item in divider.documents %}
+      <li>{{ item.title }}</li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

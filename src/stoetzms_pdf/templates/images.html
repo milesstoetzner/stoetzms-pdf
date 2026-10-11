@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}{{ images.page_style | safe }}{% endblock %}
+{% block body_class %}images{% endblock %}
+{% block content %}
+{% for page in images.pages %}
+<section class="image-page" style="height: {{ images.area_height }}pt">
+  {% if images.show_title %}
+  <h1 class="image-heading" style="height: {{ images.heading_height }}pt">{{ images.title }}</h1>
+  {% endif %}
+  {% for image in page %}
+  <figure class="image-cell" style="left: {{ image.left }}pt; top: {{ image.top }}pt; width: {{ image.cell_width }}pt">
+    <img src="{{ image.src }}" style="width: {{ image.width }}pt; height: {{ image.height }}pt" alt="{{ image.title or '' }}">
+    {% if image.title %}
+    <figcaption style="max-height: {{ images.caption_height }}pt">{{ image.title }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endfor %}
+</section>
+{% endfor %}
+{% endblock %}

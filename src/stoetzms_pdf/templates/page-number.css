@@ -1,0 +1,33 @@
+/*
+ * Printed page numbers. Rendered once per stamped page and laid over the
+ * page as a transparent layer, so source documents are never rasterized.
+ *
+ * Each page's text is in the "page-number" string; the margin box chosen by
+ * page_numbering.position shows it. Override this file in your templates
+ * directory to restyle the numbers.
+ */
+
+@page {
+  margin: {{ vertical_margin }}pt {{ horizontal_margin }}pt;
+
+  @{{ margin_box }} {
+    content: string(page-number);
+    font-family: {{ font_family }};
+    font-size: {{ page_numbering.font_size }};
+    color: {{ color }};
+    vertical-align: middle;
+  }
+}
+
+{% for size in sizes %}
+@page {{ size.name }} { size: {{ size.width }}pt {{ size.height }}pt; }
+{% endfor %}
+
+html, body { margin: 0; }
+
+.stamp {
+  string-set: page-number attr(data-text);
+  height: 1pt;
+  break-after: page;
+}
+.stamp:last-child { break-after: auto; }

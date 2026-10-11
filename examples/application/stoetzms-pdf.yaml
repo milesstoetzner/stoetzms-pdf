@@ -1,0 +1,100 @@
+# Example project for pdf.stoetz.ms. Rebuild with:
+#
+#     stoetzms-pdf
+#
+# Paths are relative to this file. Every option is documented in
+# docs/configuration.md; anything left out uses its default.
+
+version: 1
+
+document:
+  title: "Application for Example"
+  subtitle: "Supporting Documents"
+  author: "Alex Example"
+  language: "en"
+  output: "output/application.pdf"
+  number_sections: true
+
+  cover:
+    enabled: true
+    date: "2026-10-11"
+    logo: "assets/logo.svg"
+    details:
+      - label: "Programme"
+        value: "M.Sc. Example Studies"
+      - label: "Reference"
+        value: "EX-2026-0042"
+
+  toc:
+    enabled: true
+    title: "Table of Contents"
+    include_page_numbers: true
+    include_document_entries: true
+    max_depth: 2
+
+  bookmarks:
+    enabled: true
+
+  page_numbering:
+    enabled: true
+    position: "bottom-center"
+    start_at: 1
+    format: "{page} / {total}"
+    cover: false
+    toc: true
+    dividers: false
+    source_documents: true
+
+sections:
+  - title: "Application"
+    divider:
+      enabled: true
+      subtitle: "Main application documents"
+
+    documents:
+      - file: "documents/application-form.pdf"
+        title: "Application Form"
+        subsections:
+          - title: "Declaration"
+            page: 2
+
+  - title: "Proof of Identity"
+    divider:
+      enabled: true
+
+    documents:
+      - file: "documents/passport.pdf"
+        title: "Passport Copy"
+
+      # Images become pages of their own: here two scans on one page.
+      - title: "Identity Card"
+        per_page: 2
+        images:
+          - file: "documents/id-card-front.jpg"
+            title: "Front"
+          - file: "documents/id-card-back.jpg"
+            title: "Back"
+
+  - title: "Qualifications"
+    divider:
+      enabled: true
+      list_documents: true
+
+    documents:
+      - file: "documents/diploma.pdf"
+        title: "University Diploma"
+
+      - file: "documents/transcript.pdf"
+        title: "Academic Transcript"
+
+      - title: "Further Certificates"
+        per_page: 4
+        images:
+          - file: "documents/certificates/language.png"
+            title: "Language certificate (C1)"
+          - file: "documents/certificates/first-aid.png"
+            title: "First aid course"
+          - file: "documents/certificates/internship.png"
+            title: "Internship reference"
+          - file: "documents/certificates/award.png"
+            title: "Student award"

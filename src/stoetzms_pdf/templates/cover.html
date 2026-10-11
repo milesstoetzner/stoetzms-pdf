@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body_class %}cover align-{{ style.cover_align }}{% endblock %}
+{% block content %}
+<section class="cover-page">
+  {% if cover.logo %}
+  <img class="logo cover-logo" src="{{ cover.logo }}" alt="">
+  {% endif %}
+  <div class="cover-main">
+    {% if cover.accent_bar %}
+    <div class="accent-bar"></div>
+    {% endif %}
+    <h1 class="cover-title">{{ cover.title }}</h1>
+    {% if cover.subtitle %}
+    <p class="cover-subtitle">{{ cover.subtitle }}</p>
+    {% endif %}
+  </div>
+  {% if cover.author or cover.date or cover.details %}
+  <div class="cover-meta">
+    {% if cover.author %}
+    <p class="cover-author">{{ cover.author }}</p>
+    {% endif %}
+    {% if cover.date %}
+    <p class="cover-date">{{ cover.date }}</p>
+    {% endif %}
+    {% if cover.details %}
+    <table class="cover-details">
+      {% for item in cover.details %}
+      <tr><th>{{ item.label }}</th><td>{{ item.value }}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
