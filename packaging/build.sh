@@ -22,6 +22,13 @@ case "$(uname -m)" in
 esac
 NAME="stoetzms-pdf-${OS}-${ARCH}"
 
+# PyInstaller finds the Pango libraries to bundle with ctypes.util.find_library,
+# which only looks in Homebrew's lib folder if told to (e.g. with python.org's
+# Python).
+if [ "$OS" = macos ] && command -v brew >/dev/null; then
+  export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}"
+fi
+
 rm -rf build/pyinstaller "dist/${NAME}" "dist/${NAME}".*
 python -m PyInstaller --noconfirm --log-level WARN \
   --workpath build/pyinstaller --distpath build/pyinstaller/dist packaging/stoetzms-pdf.spec
@@ -29,6 +36,10 @@ python -m PyInstaller --noconfirm --log-level WARN \
 mkdir -p dist
 mv build/pyinstaller/dist/stoetzms-pdf "dist/${NAME}"
 cp LICENSE "dist/${NAME}/"
+if ! ls "dist/${NAME}/_internal" | grep -qi pango; then
+  echo "the Pango libraries were not bundled; is Pango installed?" >&2
+  exit 1
+fi
 "dist/${NAME}/stoetzms-pdf" --version
 
 if [ "$OS" = windows ]; then

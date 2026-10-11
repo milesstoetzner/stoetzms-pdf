@@ -94,15 +94,17 @@ jobs:
                   msystem: UCRT64
                   install: mingw-w64-ucrt-x86_64-pango
 
-            - name: (PREPARE) Find Pango (Windows)
-              if: runner.os == 'Windows'
-              run: echo "$(cygpath -w "${RUNNER_TEMP}/msys64/ucrt64/bin")" >> "$GITHUB_PATH"
-
             - name: (PREPARE) Install Dependencies
               run: pip install . pyinstaller
 
+            # On Windows, PyInstaller finds the MSYS2 Pango DLLs on PATH. Append
+            # them, so MSYS2's own Python does not shadow the one set up above.
             - name: (DIST) Build Binary
-              run: packaging/build.sh
+              run: |
+                  if [ "$RUNNER_OS" = Windows ]; then
+                      export PATH="$PATH:$(cygpath -u "$RUNNER_TEMP")/msys64/ucrt64/bin"
+                  fi
+                  packaging/build.sh
 
             - name: (DIST) Test Binary
               run: |
