@@ -26,7 +26,8 @@ NAME="stoetzms-pdf-${OS}-${ARCH}"
 # which only looks in Homebrew's lib folder if told to (e.g. with python.org's
 # Python).
 if [ "$OS" = macos ] && command -v brew >/dev/null; then
-  export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}"
+  BREW_LIB="$(brew --prefix)/lib"
+  export DYLD_FALLBACK_LIBRARY_PATH="${BREW_LIB}${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}"
 fi
 
 rm -rf build/pyinstaller "dist/${NAME}" "dist/${NAME}".*
@@ -36,7 +37,7 @@ python -m PyInstaller --noconfirm --log-level WARN \
 mkdir -p dist
 mv build/pyinstaller/dist/stoetzms-pdf "dist/${NAME}"
 cp LICENSE "dist/${NAME}/"
-if ! ls "dist/${NAME}/_internal" | grep -qi pango; then
+if ! compgen -G "dist/${NAME}/_internal/*pango*" >/dev/null; then
   echo "the Pango libraries were not bundled; is Pango installed?" >&2
   exit 1
 fi
