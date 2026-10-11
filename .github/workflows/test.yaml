@@ -14,6 +14,7 @@ permissions:
 jobs:
     test:
         name: Test
+        timeout-minutes: 15
         runs-on: ubuntu-22.04
         steps:
             ###################################################
@@ -56,7 +57,7 @@ jobs:
             ###################################################
 
             - name: (TEST) Run Tests
-              run: pytest
+              run: pytest -v --durations=10
 
             - name: (TEST) Build Example
               run: stoetzms-pdf --strict examples/application --output /tmp/example.pdf

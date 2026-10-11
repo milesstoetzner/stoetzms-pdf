@@ -18,6 +18,7 @@ jobs:
 
     test:
         name: Test
+        timeout-minutes: 15
         runs-on: ubuntu-22.04
         steps:
             - name: (PREPARE) Checkout Repository
@@ -36,7 +37,7 @@ jobs:
               run: pip install -e '.[test]'
 
             - name: (TEST) Run Tests
-              run: pytest
+              run: pytest -v --durations=10
 
     ###################################################
     #
@@ -46,6 +47,7 @@ jobs:
 
     binary:
         name: Binary (${{ matrix.name }})
+        timeout-minutes: 30
         needs: test
         strategy:
             fail-fast: true
@@ -124,6 +126,7 @@ jobs:
 
     release:
         name: Release
+        timeout-minutes: 15
         needs: binary
         runs-on: ubuntu-22.04
         steps:

@@ -368,7 +368,7 @@ def test_template_errors_are_reported(project, tmp_path):
 def test_missing_fonts_fail_clearly_instead_of_crashing(project, tmp_path, monkeypatch):
     import stoetzms_pdf.render as render_module
 
-    monkeypatch.setattr(render_module, "installed_font_count", lambda: 0)
+    monkeypatch.setattr(render_module, "installed_font_count", lambda: 0)  # cached otherwise
     with pytest.raises(BuildError) as exc:
         build(simple(project, tmp_path))
     assert "no fonts are installed" in str(exc.value)

@@ -9,10 +9,13 @@ from the page.
 
 from __future__ import annotations
 
+import contextlib
+import functools
 import html
 import io
 import logging
 import math
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -81,6 +84,7 @@ class _LocalOnlyFetcher(URLFetcher):
             raise FatalURLFetchingError(f"cannot read {url}: {exc}") from None
 
 
+@functools.cache
 def installed_font_count() -> int:
     """Fonts fontconfig can see, as WeasyPrint will when it lays out text."""
     from weasyprint.text.ffi import ffi, fontconfig
@@ -93,13 +97,37 @@ def installed_font_count() -> int:
         fontconfig.FcConfigDestroy(config)
 
 
+@contextlib.contextmanager
+def _fixed_font_timestamps():
+    """Keep font subsets free of the build time.
+
+    Without HarfBuzz-Subset (e.g. on Ubuntu 22.04), WeasyPrint subsets fonts
+    with fontTools, which stamps each subset with the current time unless
+    SOURCE_DATE_EPOCH is set; output would then differ from second to second.
+    """
+    if "SOURCE_DATE_EPOCH" in os.environ:
+        yield
+        return
+    os.environ["SOURCE_DATE_EPOCH"] = "0"
+    try:
+        yield
+    finally:
+        os.environ.pop("SOURCE_DATE_EPOCH", None)
+
+
+# WeasyPrint messages that are not about the user's document.
+_IGNORED_WARNINGS = ("Using fontTools instead of HarfBuzz-Subset",)
+
+
 class _WarningCollector(logging.Handler):
     def __init__(self) -> None:
         super().__init__(logging.WARNING)
         self.messages: list[str] = []
 
     def emit(self, record: logging.LogRecord) -> None:
-        self.messages.append(record.getMessage())
+        message = record.getMessage()
+        if not message.startswith(_IGNORED_WARNINGS):
+            self.messages.append(message)
 
 
 @dataclass
@@ -225,7 +253,9 @@ class Renderer:
         try:
             document = weasyprint.HTML(string=html_text, base_url=self.base_url,
                                        url_fetcher=self.fetcher)
-            result = use(document.render(stylesheets=stylesheets, font_config=self.font_config))
+            with _fixed_font_timestamps():
+                result = use(document.render(stylesheets=stylesheets,
+                                             font_config=self.font_config))
         except FatalURLFetchingError as exc:
             raise BuildError(f"{what}: {exc}") from None
         except Exception as exc:  # WeasyPrint raises a wide range of errors
