@@ -20,7 +20,7 @@ Then check that it works.
 stoetzms-pdf --version
 ```
 
-Running the same command again updates to the latest release. Binaries are available for Linux (x64 and arm64, glibc 2.35 or newer, e.g. Ubuntu 22.04 or Debian 12), macOS (Apple silicon, macOS 15 or newer) and Windows (x64). They need no Python and bring their own text-layout libraries; on Linux, at least one font must be installed (e.g. `apt install fonts-dejavu-core`). The first run takes a few seconds longer while the font cache is built.
+This installs the newest release; running it again updates. For a specific version, set `VERSION`, e.g. `curl -fsSL https://pdf.stoetz.ms/install.sh | sudo VERSION=0.1.0 bash -`. All versions are listed on the [releases page](https://github.com/milesstoetzner/stoetzms-pdf/releases). Binaries are available for Linux (x64 and arm64, glibc 2.35 or newer, e.g. Ubuntu 22.04 or Debian 12), macOS (Apple silicon, macOS 15 or newer) and Windows (x64). They need no Python and bring their own text-layout libraries; on Linux, at least one font must be installed (e.g. `apt install fonts-dejavu-core`). The first run takes a few seconds longer while the font cache is built.
 
 ### Installing with pip
 

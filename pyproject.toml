@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stoetzms-pdf"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Assemble PDF dossiers from a declarative YAML file: cover, table of contents, section dividers, bookmarks and page numbers."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
-authors = [{ name = "Miles Stoetzner" }]
+authors = [{ name = "Miles Stötzner", email = "miles@stoetzner.de" }]
 dependencies = [
     "PyYAML>=6.0",
     "Jinja2>=3.1",
@@ -26,6 +26,9 @@ test = [
 
 [project.scripts]
 stoetzms-pdf = "stoetzms_pdf.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "stoetzms_pdf.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

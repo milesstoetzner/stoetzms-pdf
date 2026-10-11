@@ -73,4 +73,13 @@ yarn build
 
 ## Release
 
-Every push to `main` runs the tests, builds and tests the binaries for Linux, macOS and Windows on GitHub Actions, replaces the `latest` release with them, and deploys the docs to GitHub Pages. The install scripts download from the `latest` release.
+Every push to `main` runs the tests and builds and tests the binaries for Linux, macOS and Windows on GitHub Actions; nothing is published.
+
+To release a version, set `__version__` in `src/stoetzms_pdf/__init__.py` (the only place the version is written), commit, and push a matching tag.
+
+```shell
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The workflow checks that the tag matches `__version__`, creates the GitHub release `v0.2.0` with the binaries, and deploys the docs. The install scripts install the newest release by default. Running the workflow by hand deploys the docs without a release.

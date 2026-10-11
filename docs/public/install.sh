@@ -4,11 +4,11 @@
 #     curl -fsSL https://pdf.stoetz.ms/install.sh | sudo bash -
 #
 # Installs into /usr/local/lib/stoetzms-pdf and links /usr/local/bin/stoetzms-pdf.
-# Set VERSION to install a release other than "latest".
+# Installs the newest release; set VERSION (e.g. VERSION=0.1.0) for another one.
 set -euo pipefail
 
 PREFIX=${PREFIX:-/usr/local}
-VERSION=${VERSION:-latest}
+VERSION=${VERSION:-}
 
 if [ "$EUID" -ne 0 ]; then
   echo "script must be executed as root"
@@ -48,7 +48,14 @@ NAME="stoetzms-pdf-${PLAT}-${ARCH}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-curl -fsSL "https://github.com/milesstoetzner/stoetzms-pdf/releases/download/${VERSION}/${NAME}.tar.xz" -o "$TMP/${NAME}.tar.xz"
+RELEASES=https://github.com/milesstoetzner/stoetzms-pdf/releases
+if [ -z "$VERSION" ]; then
+  URL="${RELEASES}/latest/download/${NAME}.tar.xz"
+else
+  URL="${RELEASES}/download/v${VERSION#v}/${NAME}.tar.xz"
+fi
+
+curl -fsSL "$URL" -o "$TMP/${NAME}.tar.xz"
 tar -xJf "$TMP/${NAME}.tar.xz" -C "$TMP"
 
 rm -rf "$PREFIX/lib/stoetzms-pdf"

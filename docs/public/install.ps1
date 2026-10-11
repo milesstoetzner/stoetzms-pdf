@@ -3,17 +3,18 @@
 #     powershell -Command "& {Invoke-WebRequest -Uri 'https://pdf.stoetz.ms/install.ps1' -UseBasicParsing | Invoke-Expression}"
 #
 # Installs into %LOCALAPPDATA%\stoetzms-pdf and adds it to the user's PATH.
-# Set VERSION to install a release other than "latest".
+# Installs the newest release; set VERSION (e.g. $env:VERSION = "0.1.0") for another one.
 
 $ErrorActionPreference = "Stop"
 
 $installDir = "$env:LOCALAPPDATA\stoetzms-pdf"
-$version = if ($env:VERSION) { $env:VERSION } else { "latest" }
 $name = "stoetzms-pdf-windows-x64"
 $archive = "$env:TEMP\$name.zip"
 
 # Download and unpack
-Invoke-WebRequest -Uri "https://github.com/milesstoetzner/stoetzms-pdf/releases/download/$version/$name.zip" -OutFile $archive -UseBasicParsing
+$releases = "https://github.com/milesstoetzner/stoetzms-pdf/releases"
+$url = if ($env:VERSION) { "$releases/download/v$($env:VERSION.TrimStart('v'))/$name.zip" } else { "$releases/latest/download/$name.zip" }
+Invoke-WebRequest -Uri $url -OutFile $archive -UseBasicParsing
 if (Test-Path -Path $installDir) {
     Remove-Item -Recurse -Force $installDir
 }

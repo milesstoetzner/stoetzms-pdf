@@ -1,11 +1,16 @@
+# Every push to main builds and tests the binaries. Pushing a tag v<version>
+# (matching __version__) publishes them as that release and deploys the docs;
+# running the workflow by hand deploys the docs only.
 name: Release
 on:
     workflow_dispatch:
     push:
         branches:
             - main
+        tags:
+            - 'v*'
 
-concurrency: release
+concurrency: release-${{ github.ref }}
 permissions:
     contents: write
 
@@ -23,6 +28,15 @@ jobs:
         steps:
             - name: (PREPARE) Checkout Repository
               uses: actions/checkout@v4
+
+            - name: (PREPARE) Check Version
+              if: startsWith(github.ref, 'refs/tags/v')
+              run: |
+                  VERSION=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/stoetzms_pdf/__init__.py)
+                  if [ "${GITHUB_REF_NAME}" != "v${VERSION}" ]; then
+                      echo "tag ${GITHUB_REF_NAME} does not match __version__ ${VERSION}" >&2
+                      exit 1
+                  fi
 
             - name: (PREPARE) Setup Python
               uses: actions/setup-python@v5
@@ -128,48 +142,48 @@ jobs:
 
     release:
         name: Release
-        timeout-minutes: 15
+        if: startsWith(github.ref, 'refs/tags/v')
         needs: binary
         runs-on: ubuntu-22.04
+        timeout-minutes: 15
         steps:
-            - name: (PREPARE) Checkout Repository
-              uses: actions/checkout@v4
-              with:
-                  lfs: true
-
             - name: (PREPARE) Download Binaries
               uses: actions/download-artifact@v4
               with:
                   path: dist
                   merge-multiple: true
 
-            - name: (RELEASE) Delete Latest Release
-              run: gh release delete latest --cleanup-tag --yes || true
+            - name: (RELEASE) Create Release
+              run: gh release create "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" --verify-tag --latest --title "${GITHUB_REF_NAME}" --generate-notes ./dist/*
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: (RELEASE) Delete Latest Tag (Local)
-              run: git tag --delete latest || true
+    ###################################################
+    #
+    # Docs
+    #
+    ###################################################
 
-            - name: (RELEASE) Create Latest Release
-              run: gh release create latest --target ${GITHUB_SHA} --latest -t "Latest Release" -n "This is the latest release of this project" ./dist/*
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    docs:
+        name: Docs
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        needs: test
+        runs-on: ubuntu-22.04
+        timeout-minutes: 15
+        steps:
+            - name: (PREPARE) Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  lfs: true
 
-            ###################################################
-            #
-            # Docs
-            #
-            ###################################################
-
-            - name: (DOCS) Setup Node
+            - name: (PREPARE) Setup Node
               uses: actions/setup-node@v6
               with:
                   node-version-file: docs/.nvmrc
                   cache: yarn
                   cache-dependency-path: docs/yarn.lock
 
-            - name: (DOCS) Install Dependencies
+            - name: (PREPARE) Install Dependencies
               run: yarn --cwd docs --frozen-lockfile
 
             - name: (DOCS) Build Docs
@@ -180,11 +194,3 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: docs/.vitepress/dist
-
-            - name: (RELEASE) Archive Docs
-              run: tar -czvf docs.tar.gz -C docs/.vitepress/dist .
-
-            - name: (RELEASE) Upload Docs to Release
-              run: gh release upload latest docs.tar.gz
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
