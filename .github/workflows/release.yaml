@@ -50,7 +50,7 @@ jobs:
         timeout-minutes: 30
         needs: test
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 include:
                     - name: linux-x64
@@ -58,7 +58,7 @@ jobs:
                     - name: linux-arm64
                       runner: ubuntu-22.04-arm
                     - name: macos-arm64
-                      runner: macos-14
+                      runner: macos-15
                     - name: windows-x64
                       runner: windows-2022
         runs-on: ${{ matrix.runner }}
